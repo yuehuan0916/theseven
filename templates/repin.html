@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行行程規畫系統</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color:#9ddaff;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: auto;
+        }
+        .autocomplete-suggestion {
+            padding: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            margin: 2px;
+            transition: background-color 0.3s;
+            display: inline-block;
+            width: calc(25% - 10px); /* 每行四個 */
+            min-width: 200px;
+            align-items: center;
+            display: flex;
+            justify-content: center; /* 水平置中（可選） */
+            min-height: 40px; 
+        }
+        .autocomplete-suggestion:hover {
+            background-color: #f0f0f0;
+        }
+        .autocomplete-suggestions {
+            max-height: 150px; /* 最大高度 */
+            overflow-y: auto; /* 垂直滾動 */
+            width: 750px;
+            margin: 10px ;
+            box-sizing: border-box;
+            text-align: left;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; /* 調整選項間距 */
+        }
+        .options-inline {
+            display: flex;
+            justify-content: center; /* 中心对齐整个容器内的内容 */
+            width: 100%; /* 确保占满可用宽度 */
+        }
+        
+        .left-align {
+            display: flex;
+            flex-direction: column; /* 纵向排列 */
+            align-items: flex-start; /* 向左对齐 */
+            margin-right: 20px; /* 为左对齐的复选框增加右边距，避免与中心对齐的复选框过于接近 */
+        }
+        
+        .center-align {
+            display: flex;
+            flex-direction: column; /* 纵向排列 */
+            align-items: center; /* 居中对齐 */
+        }
+        
+        #additional-questions, #address-input {
+            display: none; /* 初始狀態隱藏 */
+        }
+        button{
+            background-color: #cc7c93;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>旅遊行程規畫系統</h1>
+        <h5>路線的規劃是預設自行駕車前往</h5>
+        
+        <!-- 已移除選擇起點的部分 -->
+
+        <!-- 額外問題 -->
+        <div id="extraForm">
+            <h2>是否已經想好目的地</h2>
+            <hr>
+            <label for="yes">
+                <input type="radio" name="question1" id="yes" value="yes" onclick="toggleQuestions()"> 想好了
+            </label>
+            <label for="no">
+                <input type="radio" name="question1" id="no" value="no" onclick="toggleQuestions()"> 沒有想法
+            </label>
+            <br><br>
+            <div id="address-input">
+                <label for="address">景點:</label>
+                <input type="text" id="address" name="address">
+                <div id="suggestions" class="autocomplete-suggestions"></div>
+            </div>
+            <div id="additional-questions">
+                <h2>選擇想去的縣市或是景點類型</h2>
+                <hr>
+                <h3>縣市</h3>
+                <div class="options-inline">
+                    <select id="additional-country" name="country">
+                        <option value="" selected disabled>請選擇</option>
+                        <option value="all">都可以</option>
+                    </select>
+                </div>
+                <br>
+                <h3>景點類型</h3>
+                <div class="options-inline">
+                    <div class="left-align">
+                        <label>
+                            <input type="checkbox" name="attraction" value="商業型"> 商業型
+                        </label>
+                        <label>
+                            <input type="checkbox" name="attraction" value="歷史性"> 歷史性
+                        </label>
+                    </div>
+                    <div class="center-align">
+                        <label>
+                            <input type="checkbox" name="attraction" value="大自然資源"> 大自然資源
+                        </label>
+                        <label>
+                            <input type="checkbox" name="attraction" value="社會文化性"> 社會文化性
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <form id="adviceForm" action="/readvice" method="POST">
+                <input type="hidden" id="form-country" name="country">
+                <input type="hidden" id="form-address" name="address">
+                <input type="hidden" id="form-recommendations" name="recommendations">
+                <!-- 已移除與起點相關的隱藏字段 -->
+                <button type="button" onclick="handleFormSubmit()">提交</button>
+            </form>            
+        </div>
+    </div>
+
+    <script>
+        function toggleQuestions() {
+            var question1 = document.querySelector('input[name="question1"]:checked').value;
+            var additionalQuestions = document.getElementById("additional-questions");
+            var addressInput = document.getElementById("address-input");
+    
+            if (question1 === "yes") {
+                additionalQuestions.style.display = "none";
+                addressInput.style.display = "block";
+                document.getElementById('adviceForm').action = '/index77x';
+            } else {
+                additionalQuestions.style.display = "block";
+                addressInput.style.display = "none";
+                document.getElementById('adviceForm').action = '/readvice';
+            }
+        }
+    
+        function handleFormSubmit() {
+            var question1 = document.querySelector('input[name="question1"]:checked').value;
+            // 已移除與起點相關的變數和邏輯
+
+            var recommendations = [];
+            var additionalCountry = document.getElementById('additional-country').value;
+        
+            // 檢查用戶選擇
+            if (question1 === 'yes') {
+                var destination = document.getElementById('address').value;
+                // 保存目的地到 localStorage
+                localStorage.setItem('destination', destination);
+            } else {
+                // 檢查是否至少選擇了一個
+                if (!additionalCountry && recommendations.length === 0) {
+                    alert('請至少選擇一個縣市或景點類型！');
+                    return; // 不提交表單
+                }
+            }
+        
+            // 收集景點類型的選擇
+            var selectedOptions = document.querySelectorAll('input[name="attraction"]:checked');
+            selectedOptions.forEach(option => {
+                recommendations.push(option.value);
+            });
+        
+            // 填寫隱藏表單
+            document.getElementById('form-country').value = additionalCountry || ''; // 可選
+            document.getElementById('form-recommendations').value = recommendations.join(',') || ''; // 可選
+            document.getElementById('adviceForm').submit();
+        }
+    
+        function fetchSuggestions(query) {
+            fetch(`/search?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const suggestionsDiv = document.getElementById('suggestions');
+                    suggestionsDiv.innerHTML = '';
+                    data.forEach(suggestion => {
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.className = 'autocomplete-suggestion';
+                        suggestionDiv.textContent = suggestion;
+                        suggestionDiv.onclick = () => {
+                            document.getElementById('address').value = suggestion;
+                            suggestionsDiv.innerHTML = '';
+                        };
+                        suggestionsDiv.appendChild(suggestionDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching suggestions:', error));
+        }
+    
+        function fetchCities() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    const additionalCountrySelect = document.getElementById('additional-country');
+                    data.cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.name;
+                        additionalCountrySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching cities:', error));
+        }
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchCities();
+    
+            document.getElementById('address').addEventListener('input', function () {
+                const query = this.value;
+                if (query.length > 0) {
+                    fetchSuggestions(query);
+                } else {
+                    document.getElementById('suggestions').innerHTML = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

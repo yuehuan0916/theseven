@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-RYHRiVoOd3Jvi4KpZVlKDnpv5AkDYHtW0zHXp67zHFI+s44HtqIu1qLQwW/04Ar+CPM2z31Rc//ZvOZwXCEidA==" crossorigin="anonymous" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="path/to/leaflet.polyline.gradient.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #map { 
+            height: 75vh; 
+            position: relative; 
+            z-index: 0; 
+        }
+        #nearly_map { 
+            height: 75vh; 
+            
+            z-index: 0; 
+            border-radius: 5px; 
+        }
+        #custom-button, #summary-button {
+            position: absolute;
+            right: 1vw;
+            background-color: #3388ff;
+            color: white;
+            border: none;
+            padding: 1vw 2vw;
+            cursor: pointer;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            font-size: 1.20vw;
+        }
+
+        #custom-button {
+            top: 1vw;
+        }
+
+        #summary-button {
+            top: 5.5vw;
+        }
+
+        #love-button, #around-button, #mid-button, #road-button, #travel-button {
+            position: absolute;
+            background-color: #cc7c93;
+            color: white;
+            border: none;  
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 2;
+            font-size: 10px;
+            width: auto;
+            top: 10px;
+            height: 40px;
+            text-align: center;
+        }
+
+        #road-button {
+            right: 320px; 
+            padding: 7px;
+                    
+        }
+        #mid-button {
+            right: 230px;
+            padding: 7px;
+        }
+        #around-button {
+            right: 170px;
+        }
+        #love-button {
+            right: 80px;
+        }
+        #travel-button {        
+            right: 20px;
+            padding: 7px;
+        }
+
+        #searchForm {
+            position: relative;
+            bottom: -7px;
+            left: 18px;
+            width: auto;
+        }
+
+        #otherSearchForm {
+            position: relative;
+            bottom: -15px;
+            left: 18px;
+            width: auto;
+        }
+        
+        .custom-popup {
+            font-size: 10px; /* 设置弹出窗口中文本的字体大小 */
+        }
+
+        #button_content {
+            display: none;
+            text-align: center;
+            border-radius: 5px; 
+            margin: 0 auto;
+            background: linear-gradient(to bottom right, #77b5f7, #FFC0CB); 
+           
+        }
+        #table_center {
+            margin: 0 auto; /* 水平居中 */ 
+            
+        }
+
+        #delete-button {        
+            border-radius: 7px; 
+            font-size: 11px;
+            font-weight: bold;
+            margin: 0 auto;
+            z-index: 2;
+        }
+        #nearly-button {        
+            position: relative;
+
+            border-radius: 5px; 
+            background-color: #3e76e5;
+            color: white;
+            font-size: 11px;
+            margin: 0 auto;
+            font-weight: bold;
+            text-align: center;
+            z-index: 2;
+            padding: 10px 20px;
+            top: 50%;  
+            left: 50%;
+            transform: translate(-50%, -50%); 
+        }
+        #nearly_data_button {
+            position: absolute;
+            top: 1vw;
+            right: 1vw;
+            background-color: #3388ff;
+            color: white;
+            padding: 1vw 2vw;
+            cursor: pointer;
+            border-radius: 5px;
+            display: none;
+            z-index: 1000;
+            font-size: 1.20vw;
+        }
+        
+        .banner {
+            position: relative;
+            width: auto;/*設定寬度為100%*/
+            height: auto;/*設定高度為300px*/
+            border-radius: 5px; 
+            background: linear-gradient(to bottom right, #9cc8f7,#9efff5 );
+            
+        }
+
+        .help_sp {         
+            border-radius: 5px; 
+            background-color: rgb(238, 242, 202);
+        }
+        .all_div {
+            width: auto;
+            height: auto;
+            margin: 0;
+            padding: 0;
+    
+        }
+
+        table {
+            width: 35%; /* 表格寬度 */
+            text-align: center;
+        }
+        tr {
+            background-color: #f4f3f3;
+        }
+        #other-link {
+            border-radius: 5px; 
+            display: none;
+            background-color: #e7f3c8;
+        }
+        #data-link {
+            border-radius: 5px; 
+            display: none;
+            background-color: #e7f3c8;
+        }
+        #nearly_data {
+            border-radius: 5px; 
+            display: none; 
+            background-color: #d0f1e6;
+            padding : 30px;
+        }
+        #nearly-all {
+            border-radius: 5px; 
+            display: none; 
+            background-color: #8fa4bd;
+        }
+        #button_content_route {
+            display: none;
+            padding : 30px;
+            border-radius: 5px; 
+            margin: 0 auto;
+            background: linear-gradient(to bottom right, #77b5f7, #FFC0CB); 
+        }
+        #choose {
+            width: auto;
+            height: auto;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 7px; 
+        }
+        #upping {
+            position: fixed;
+            color: white;
+            background-color: #3e76e5;
+            bottom: 15px;
+            height: 30px;
+            font-weight:bold;
+            right: 15px;
+            font-size: 10px;
+            border-radius: 7px; 
+            display: none;
+            z-index: 10; 
+            border: 1px solid rgb(255, 255, 255);
+        }
+        button:hover {
+            /* :hover 代表滑鼠移到元素上時的狀態 */ 
+            transform: scale(1.05);
+        }
+        button:active {
+            /* :active是滑鼠點擊元素的狀態 */
+            transform: scale(1);
+            background-color: #b2c6f6;
+            box-shadow: inset 0 0 10px 1px rgba(0, 0, 0, .2);
+        }
+        button{
+            font-weight: bold;
+            transition: .1s;
+            border: 1px solid rgb(0, 0, 0);
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .info {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            border-radius: 5px; 
+            margin: 0 auto;
+        }
+        .info p {
+            line-height: 1.5;
+        }
+        .summary-content {
+            margin-top: 10px;
+            text-align: center;
+            display: block;
+        }
+
+        .b_summary {
+            background-color: #3e76e5;
+            color: white;
+            border-radius: 7px; 
+            font-size: 11px;
+            text-align: center;
+            padding: 5px 10px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="all_div">
+   
+        <div class="banner">
+           
+    
+            <form id="searchForm" action="/retrain" method="GET">
+                <label for="location" style="font-weight: bold;">[起點]: <span id="start" style="font-weight: bold;"></span>&nbsp;</label>
+                <button  id="choose" type="submit">重新選擇</button>
+            </form>
+    
+            <form id="otherSearchForm" action="/repin" method="GET">
+                <label for="otherLocation" style="font-weight: bold;">[主要想去的目的地]: <span id="end" style="font-weight: bold;"></span>&nbsp;</label>
+                <button id="choose" type="submit" >重新選擇</button>
+            </form>
+                
+            
+
+            <button id="road-button">起點與目的地之<br>路徑</button>
+            <button id="mid-button">起點與目的地之<br>中間景點</button>
+            <button id="around-button">目的地之<br>周圍景點</button>
+            <button id="love-button">目前選擇的景點<br>(行程內容)</button>
+            <button id="travel-button">行程規劃</button>
+            <br>
+            <br>
+            <div id="map">
+                <button id="custom-button">加入該景點到行程中</button>
+                <button id="summary-button" data-target="someTargetId">景點相關資訊</button>
+            </div>
+            
+            
+        </div>
+        <button id="upping">置頂</button>
+            
+        <p></p>
+        <div id="button_content_route"></div>
+        <div id="button_content">
+            <br/>
+            <h1 style="font-size: 15px;">目前選擇的景點(行程內容_不含順序)</h1>
+            <br/>
+            <div id="table_center"> 
+                
+            </div>
+          
+            <h1><button id="delete-button">確定刪除</button></h1>
+            <br/>
+        </div>
+
+        </div>
+        <p></p>
+       <div id="other-link">          
+        </div>
+        <div id="data-link">  
+           
+            <div id="p_data"  style="padding: 30px;"></div>
+           <br/>
+            <div id="nearly-all">
+                <div style="height: 7px;"></div>
+
+                <div id="nearly_map">
+                    <button id="nearly_data_button">相關資訊</button>
+                </div>  
+                
+                <div style="height: 3px;"></div>
+                <div id="nearly_data">
+                </div> 
+                <div style="height: 7px;"></div>
+            </div> 
+            
+
+        </div>
+        <br/>
+        
+    </div>
+    
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    //地图的中心点坐标为纬度 25.033 和经度 121.565(初始頁面:桃園火車站)
+    var map = L.map('map').setView([25.033, 121.565], 12);
+    map.setMinZoom(6.5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    var tele1 = document.getElementById('data-link');
+    tele1.style.display='block';
+    var tele = document.getElementById('nearly-all');
+    tele.style.display='block';
+    var nearly_map = L.map('nearly_map').setView([25.033, 121.565], 12);
+
+    nearly_map.setMinZoom(6.5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(nearly_map);
+    //nearly_map.invalidateSize();
+    tele.style.display='none';
+    tele1.style.display='none';
+    
+    //var searchForm = document.getElementById('searchForm');
+    var otherSearchForm = document.getElementById('otherSearchForm');
+    var customButton = document.getElementById('custom-button');
+    var summaryButton = document.getElementById('summary-button');
+    var currentMarker = null; // 用于跟踪当前的标记对象
+    // 创建一个空数组来存储位置信息
+    var locationRecords = [];
+    var ard_id=0;
+    var mid_id=0;
+    var tr_id=0;
+    var routes = [];
+    let currentTargetId_CN = '';
+    let CN_check= false;
+    var lat_start,lon_start,lat_end,lon_end;
+
+    // 当按钮被点击时显示消息
+    customButton.addEventListener('click', function() {
+
+        currentMarker=markers[currentFormName]
+        if (currentMarker) {
+            var locationName = currentMarker.getPopup().getContent();
+            var latLng = currentMarker.getLatLng();
+
+            // 检查是否已经存在相同的位置信息
+            var isDuplicate = locationRecords.some(function(record) {
+                return record.name === locationName && record.latitude === latLng.lat && record.longitude === latLng.lng;
+            });
+            // 如果不是重复的位置信息，则添加到数组中
+            if (!isDuplicate) {
+                // 将位置信息添加到数组中
+                locationRecords.push({
+                    name: locationName,
+                    latitude: latLng.lat,
+                    longitude: latLng.lng
+                });
+                let otherIconUrl = '/static/select_tr2-icon.png';
+                createMarker(latLng.lat, latLng.lng, locationName, 'travel'+tr_id, otherIconUrl,true);
+                //createMarker(latLng.lat, latLng.lng, locationName, 'travelx'+tr_id, otherIconUrl);
+                tr_id++;
+                var locationInfo = "景點名稱：" + locationName + "\n";
+                alert( locationInfo + '已加入該景點至行程中！');
+                
+
+            } else {
+                // 如果是重复的位置信息，则显示提示消息
+                alert('此景點已在行程紀錄中了，請另選其他景點至行程中！');
+            }
+        }
+    });
+
+    // 定義資料集
+           /* var locationRecords = [
+                {name: '景點A', latitude: 25.0330, longitude: 121.5654},
+                {name: '景點B', latitude: 24.8070, longitude: 121.0020},
+                {name: '景點C', latitude: 23.9738, longitude: 120.9820}
+                // 可以添加更多位置
+            ];*/
+
+    let isProcessing = false;
+
+    // 異步函數來處理獲取和顯示景點資訊
+    
+// 儲存摘要內容的對象
+const summaries = {
+    'S1': '',
+    'S2': '',
+    'S3': ''
+};
+let place_data = '';
+
+let result_s;
+// 異步函數來處理獲取和顯示景點資訊
+async function place_information(locationName, csv='/static/data_Attractions.csv') {
+    try {
+        const response = await fetch(csv);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const csvData = await response.text();
+        
+        // 解析 CSV 文件
+        const rows = csvData.split('\n');
+        const headers = rows[0].split(',');
+        const data = [];
+
+        for (let i = 1; i < rows.length; i++) {
+            const values = rows[i].split(',');
+            if (values.length === headers.length) {
+                const obj = {};
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = values[j];
+                }
+                data.push(obj);
+            }
+        }
+
+        result_s = data.find(item => item.Name === locationName);
+        place_data='';
+        
+        if (result_s) {
+            if (csv === '/static/data_Attractions.csv') {
+                let websiteHtml = result_s['Website'] ? `<a href="${result_s['Website']}" target="_blank">${result_s['Website']}</a>` : '暫無資料';
+                place_data = `
+                    <div class="info">
+                        <button id="btnS1" onclick="toggleSummary('S1')" class="b_summary">摘要1</button>
+                        <button id="btnS2" onclick="toggleSummary('S2')" class="b_summary">摘要2</button>
+                        <button id="btnS3" onclick="toggleSummary('S3')" class="b_summary">摘要3</button>
+
+                        <div id="summary_c" class="summary-content"></div>
+
+                        <p><strong>網址:</strong> ${websiteHtml}</p>
+                        <p><strong>地址:</strong> ${result_s['Address'] || '暫無資料'}</p>
+                        <p><strong>電話:</strong> ${result_s['Tel'] || '暫無資料'}</p>
+                        <p><strong>營業時間:</strong> ${result_s['Opentime'] || '暫無資料'}</p>
+                        <p><strong>簡介:</strong> ${result_s['Toldescribe'] || '暫無資料'}</p>
+                    </div>`;
+                
+                // 儲存摘要內容
+                summaries['S1'] = result_s['S1'] || '暫無資料';
+                summaries['S2'] = result_s['S2'] || '暫無資料';
+                summaries['S3'] = result_s['S3'] || '暫無資料';
+                
+            } else {
+                place_data = `
+                    <div class="info">
+                        <p><strong>地址:</strong> ${result_s['Add'] || '暫無資料'}</p>
+                        <p><strong>電話:</strong> ${result_s['Tel'] || '暫無資料'}</p>
+                        <p><strong>營業時間:</strong> ${result_s['Opentime'] || '暫無資料'}</p>
+                        <p><strong>簡介:</strong> ${result_s['Description'] || '暫無資料'}</p>
+                    </div>`;
+            }
+        } else {
+            place_data = `<div class="info"><p>沒有找到相關資訊。</p></div>`;
+        }
+
+        return place_data;
+
+    } catch (error) {
+        console.error('Error processing file:', error);
+        return '<p>加載資訊時發生錯誤。</p>';
+    }
+}
+
+// 顯示摘要內容
+function toggleSummary(summaryId) {
+    const summaryContent = document.getElementById('summary_c');
+    if (summaryContent) {
+        //alert(`${summaries[summaryId]}`);
+        summaryContent.innerHTML ='';
+        summaryContent.innerHTML = `<p><strong>${summaryId}:</strong> ${summaries[summaryId] || '暫無資料'}</p>`;
+    }
+}
+
+
+    let isFetching = false;
+    document.getElementById('love-button').addEventListener('click', async function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+            var contentR = document.getElementById('button_content_route');
+            if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+            }
+            contentR = document.getElementById('data-link');
+            if(contentR){
+                    let con = document.getElementById('nearly-all');
+                    if(con.style.display ==='block'){
+                        con.style.display = 'none'; // 隱藏內容
+                    }
+                    if(contentR.style.display ==='block'){
+                        contentR.style.display = 'none'; // 隱藏內容
+                    }
+                    
+            }
+            contentR = document.getElementById('other-link');
+            if(contentR){
+                    if(contentR.style.display ==='block'){
+                        contentR.style.display = 'none'; // 隱藏內容
+                    }
+            }
+            async function displayTable() {
+                try {
+                var tableHTML = `<table border="1" style="font-size: 12px; background: #FFFFFF;  margin: 0 auto; table-layout: auto; ">
+                    <thead><tr><th>欲刪除的景點
+                        </th><th>景點名稱</th></tr></thead><tbody>`;
+                    //style="white-space: nowrap;<input type="checkbox" class="all_select" style="vertical-align: middle; ">
+                var locationRecords_x = [...locationRecords];
+                var start_name = markers['searchForm'].getPopup().getContent(); // start name
+                var end_name = markers['otherSearchForm'].getPopup().getContent(); // end name
+            
+
+                // 找出 locationRecords 中 name 為 start_name 和 end_name 的索引
+                var startIndex = locationRecords.findIndex(record => record.name === start_name);
+            
+                var endIndex = locationRecords.findIndex(record => record.name === end_name);
+                if (endIndex > startIndex) {
+                    endIndex -= 1;
+                }
+                // 提取起點記錄
+                var startRecord = locationRecords_x.splice(startIndex, 1)[0];
+                var endRecord = locationRecords_x.splice(endIndex, 1)[0];
+                
+                // 遍歷剩餘的 locationRecords_x 並將每個記錄添加到表格中
+                locationRecords_x.forEach(function(record) {
+                    tableHTML += '<tr><td><input type="checkbox" name="record_select" value="' + record.name + '"></td>' + '<td><a href="#" class="show-link" data-target="'+record.name+'">' + record.name + '</a></td></tr>';
+                });
+
+                // 添加表格的閉合標籤
+                tableHTML += '</tbody></table>';
+
+                // 將表格HTML添加到當前頁面的一個元素中
+                var container = document.getElementById('table_center');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'table_center';
+                    document.body.appendChild(container);
+                }
+                container.innerHTML = tableHTML;
+
+                /*
+                // 綁定全選按鈕的點擊事件
+                document.querySelector('.all_select').addEventListener('click', function() {
+                        var isChecked = this.checked;
+                        document.querySelectorAll('input[name="record_select"]').forEach(function(checkbox) {
+                            checkbox.checked = isChecked;
+                        });
+                });
+            
+                // 綁定每個 record_select 按鈕的點擊事件
+                document.querySelectorAll('input[name="record_select"]').forEach(function(checkbox) {
+                        checkbox.addEventListener('click', function() {
+                            var allChecked = document.querySelectorAll('input[name="record_select"]:checked').length === document.querySelectorAll('input[name="record_select"]').length;
+                            document.querySelector('.all_select').checked = allChecked;
+                        });
+                }); */
+                // 綁定每個 a.show-link 的點擊事件
+                document.querySelectorAll('a.show-link').forEach(function(link) {
+                    link.addEventListener('click', async function(event) {
+                        event.preventDefault(); // 阻止默認行為
+                        var targetId = this.getAttribute('data-target'); 
+                        currentTargetId_CN = targetId;
+                        var targetDiv_close = document.getElementById('nearly_data');
+                        if(targetDiv_close.style.display=='block')
+                            targetDiv_close.style.display='none';
+                        targetDiv_close = document.getElementById('nearly_map');
+                        if(targetDiv_close.style.display=='block')
+                            targetDiv_close.style.display='none';
+                        targetDiv_close = document.getElementById('nearly-all');
+                        if(targetDiv_close.style.display=='block')
+                            targetDiv_close.style.display='none';
+                             
+                        CN_check=true;
+                        document.getElementById('summary-button').click();
+                        CN_check-false;
+                        /*
+                        var targetDiv = document.getElementById("other-link");
+                        targetDiv.innerHTML="";
+                        if (targetDiv) {
+
+                                var targetId = this.getAttribute('data-target'); // 获取 data-target 属性值
+                                
+                                var title = '<h1 style="text-align: center;">' + targetId + ' 景點之相關資訊</h1>';
+                                // 更新信息容器的内容
+                                targetDiv.innerHTML+='<br/>';
+                                targetDiv.innerHTML +=  title;
+                                targetDiv.innerHTML+='<p style="height: 5px;"></p>';
+                                
+                                var place_data =  await place_information(targetId);
+                                
+                                targetDiv.innerHTML += place_data;
+                                targetDiv.innerHTML+='<br/>';
+                                targetDiv.innerHTML+='<br/>';
+
+                                targetDiv.style.display = 'block'; // 顯示內容
+                                var offsetPosition = targetDiv.offsetTop;
+                                window.scrollTo({
+                                    top: offsetPosition,
+                                    behavior: 'smooth' // 使用平滑滾動
+                                });
+                            
+                        }
+                                */
+                    });
+                });
+                    } catch (error) {
+                console.error('Error fetching place data:', error);
+            }
+        }
+
+        displayTable();
+
+            var content = document.getElementById('button_content');
+            content.style.display = 'block'; // 顯示內容
+            window.scrollTo({
+                top: window.innerHeight * 1, // 計算滾動位置，這裡是螢幕高度的1倍
+                behavior: 'smooth' // 使用平滑滾動
+            });
+
+
+    });
+
+    
+    // 點擊其他地方時隱藏內容
+    document.addEventListener('click', function() {
+        
+        let bannerDiv = document.querySelector('.banner');
+        if (bannerDiv && bannerDiv.contains(event.target)) {
+
+            let content = document.getElementById('button_content');
+            if(content && !content.contains(event.target)){
+                if(content.style.display ==='block'){
+                    content.style.display = 'none'; // 隱藏內容
+                    window.scrollTo({
+                        top: 0, // 計算滾動位置，這裡是螢幕高度的1倍
+                        behavior: 'smooth' // 使用平滑滾動
+                    });
+
+                }
+            }
+            content = document.getElementById('button_content_route');
+            
+            if(content && !content.contains(event.target)){
+                if(content.style.display ==='block' ){
+                    
+                    content.style.display = 'none'; // 隐藏内容
+                    window.scrollTo({
+                        top: window.innerHeight * 0, // 計算滾動位置，這裡是螢幕高度的1倍
+                        behavior: 'smooth' // 使用平滑滾動
+                    });
+
+                }
+            }
+            let content_t = document.getElementById('button_content')//目前選擇的景點
+            let targetDiv = document.getElementById("other-link"); //行程+景點資訊
+            if (targetDiv &&  !targetDiv.contains(event.target)) {
+                if(targetDiv.style.display ==='block'){
+                    targetDiv.style.display = 'none';  
+                    window.scrollTo({
+                        top: 0, // 計算滾動位置，這裡是螢幕高度的1倍
+                        behavior: 'smooth' // 使用平滑滾動
+                    });
+
+                }
+                          
+            }
+            targetDiv = document.getElementById("data-link"); //景點資訊
+            if (targetDiv && !targetDiv.contains(event.target)) {
+                    let con = document.getElementById('nearly-all');
+                    if(con.style.display ==='block'){
+                        con.style.display = 'none'; // 隱藏內容
+                    }    
+                    let conx = document.getElementById('nearly_data');
+                    if(conx.style.display ==='block'){
+                        conx.style.display = 'none'; // 隱藏內容
+                    } 
+
+
+                if(targetDiv.style.display ==='block'){
+                    targetDiv.style.display = 'none';  
+                    window.scrollTo({
+                        top: 0, // 計算滾動位置，這裡是螢幕高度的1倍
+                        behavior: 'smooth' // 使用平滑滾動
+                    });
+
+                }
+                      
+            }
+        }
+        /*
+        let nearlyDiv = document.querySelector('.nearly_all');
+        if (nearlyDiv && nearlyDiv.contains(event.target)) { 
+            
+                if(nearlyDiv.style.display ==='block'){
+                    nearlyDiv.style.display = 'none';  
+                    window.scrollTo({
+                        top: 0, // 計算滾動位置，這裡是螢幕高度的1倍
+                        behavior: 'smooth' // 使用平滑滾動
+                    });
+
+                }
+                          
+            }
+        }  */
+    });
+
+    // 點擊內容區域本身時阻止事件冒泡
+    document.getElementById('button_content').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+    });
+    // 點擊內容區域本身時阻止事件冒泡
+    document.getElementById('button_content_route').addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+    });
+    
+    document.getElementById('delete-button').addEventListener('click', function() {
+            var checkboxes = document.querySelectorAll('input[name="record_select"]:checked');
+            var selectedRecords = [];
+            checkboxes.forEach(function(checkbox) {
+                selectedRecords.push(checkbox.value);
+            });
+
+            // 函數用於刪除所有路徑
+            function clearRoutes() {
+                            routes.forEach(function(route) {
+                                map.removeLayer(route);  // 從地圖上移除路徑
+                            });
+                            routes = [];  // 清空數組
+                    }
+            clearRoutes(); 
+
+            if (selectedRecords.length > 0) {
+
+                
+                if(locationRecords.length == 0)
+                    tr_id=0;                
+                // 刪除選中的景點
+                alert("刪除成功，景點: " + selectedRecords.join(', ')+" 已從行程中刪除");
+                selectedRecords.forEach(function(name) {
+
+                    // 查找要刪除的標記
+                    
+                    var index = locationRecords.findIndex(record => record.name === name);
+                    if (index !== -1) {
+                        locationRecords.splice(index, 1);
+                    }
+                    //var formName = 'travelx';
+                   // 遍歷 markers 對象，尋找要刪除的標記
+                    for (let key in markers) {
+                        if (markers.hasOwnProperty(key)) {
+                            if (/^travel\d+$/.test(key)) {  // 使用正則表達式匹配鍵名
+                                let marker = markers[key];
+
+                                // 確保 marker 存在
+                                if (marker && marker.getPopup() && marker.getPopup().getContent() === name) {
+                                    map.removeLayer(marker);  // 從地圖上移除 marker
+                                    delete markers[key];     // 從 markers 對象中刪除 marker
+                                }
+                            }
+                        }
+                    }
+                                    
+                });
+                    
+                
+                
+
+                var targetDiv = document.getElementById("other-link");
+
+                if (targetDiv) {
+                        targetDiv.style.display = 'none'; // 顯示內容
+                        var targetDiv = document.getElementById('other-link');
+                        /*
+                        var offsetPosition = targetDiv.offsetTop;
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth' // 使用平滑滾動
+                        });
+                        */
+                    
+                }
+                
+                document.getElementById('love-button').click();
+                document.getElementById('love-button').click();
+                
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth' // 使用平滑滾動
+                });
+                
+                var latLng1 = markers['searchForm'].getLatLng();//sart location
+                var latLng2 = markers['otherSearchForm'].getLatLng();//end location
+                map.setView([(latLng1.lat+latLng2.lat)/2,(latLng1.lng+latLng2.lng)/2], 9);
+               
+            } else {
+                if(locationRecords.length > 0)
+                {
+                    alert("沒有勾選任何欲刪除的景點");
+                }
+                else
+                {  
+                    alert("目前沒有任何景點加入到行程中，請先加入景點");}
+                
+            }
+       });
+    
+    document.getElementById('upping').addEventListener('click', function() {
+        //window.scrollTo(0, 0); //置頂
+        // 自定義平滑滾動效果
+        var scrollDuration = 200; // 滾動持續時間（毫秒）
+        var start = window.scrollY;
+        var startTime = performance.now();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // 使用平滑滾動
+        });
+
+        var contentR = document.getElementById('upping');
+        if(contentR.style.display ==='block'){
+            contentR.style.display = 'none'; // 隱藏內容
+        }
+    }); 
+    //upping button出現，超過高度，滑動動畫
+    
+    window.onscroll = function() {
+        // 获取当前的滚动位置
+        var scrollPosition = window.scrollY || document.documentElement.scrollTop;
+
+        // 如果滚动位置大于或等于200像素，则显示置顶按钮
+        if (scrollPosition >= 50) {
+            upping.style.display = 'block'; // 显示置顶按钮
+        } else {
+            upping.style.display = 'none'; // 隐藏置顶按钮
+        }
+    };
+    let debounceTimer;
+    function debounce(func, delay) {
+        return function(...args) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+    var nearly_markers=[];
+    async function removeAllMarkers() {
+        //alert(locationRecords.length);
+        nearly_markers.forEach(marker => {
+            nearly_map.removeLayer(marker);
+        });
+        nearly_markers = []; // 清空标记数组
+        
+    }
+
+    var currentName_rh=null;
+    let IconUrl_2 = '/static/nearly-r-icon.png';
+    let IconUrl_3 = '/static/nearly-h-icon.png';
+    let csv_2='/static/Restaurant_cut.csv';
+    let csv_3='/static/Hotel_cut.csv';
+
+    document.getElementById('summary-button').addEventListener('click', async function(event) {
+        event.stopPropagation();
+        event.preventDefault(); // 阻止默認行為
+
+        // 获取信息容器
+        contentR = document.getElementById('other-link');
+        if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+        }
+        contentR = document.getElementById('button_content');
+        if(contentR&&CN_check==false){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+        }
+        var targetDiv_close = document.getElementById('nearly_data');
+        if(targetDiv_close.style.display=='block')
+            targetDiv_close.style.display='none';
+        targetDiv_close = document.getElementById('nearly_map');
+            if(targetDiv_close.style.display=='block')
+                targetDiv_close.style.display='none';
+        targetDiv_close = document.getElementById('nearly-all');
+            if(targetDiv_close.style.display=='block')
+                targetDiv_close.style.display='none';
+
+        var infoContainer = document.getElementById('p_data');
+        infoContainer.innerHTML="";
+        var bc_check = document.getElementById('button_content');
+        let locationNameSum,lat_Sum,lon_Sum;
+        // 确保当前存在标记和表单
+        if(bc_check.style.display==='block'&&CN_check){
+            locationNameSum = currentTargetId_CN;
+            var foundRecord = locationRecords.find(record => record.name === locationNameSum);
+            lat_Sum=foundRecord.latitude;
+            lon_Sum=foundRecord.longitude;
+        }   
+        else{
+            var currentMarker = markers[currentFormName];
+            locationNameSum = currentMarker.getPopup().getContent();
+            var latLng_Sum = currentMarker.getLatLng();
+            lat_Sum=latLng_Sum.lat;
+            lon_Sum=latLng_Sum.lng;
+        }
+        
+        // 创建内联样式
+        var title = '<h1 style="text-align: center;">[景點] ' + locationNameSum + ' </h1>';
+
+        // 更新信息容器的内容
+        infoContainer.innerHTML+='<br/>';
+        infoContainer.innerHTML +=  title;
+        infoContainer.innerHTML+='<p style="height: 5px;"></p>';
+        var other_targetDiv = document.getElementById("other-link");
+        other_targetDiv.innerHTML="";
+        var place_data = await place_information(locationNameSum);
+        infoContainer.innerHTML += place_data;
+        infoContainer.innerHTML+='<br/>';
+        infoContainer.innerHTML+='<br/>';
+        infoContainer.innerHTML +='<button id="nearly-button">附近住宿與餐廳</button>';
+        infoContainer.innerHTML+='<br/>';
+        infoContainer.innerHTML+='<br/>';
+        // 显示信息容器
+        infoContainer.style.display = 'block';
+
+        var targetDiv = document.getElementById('data-link');
+        targetDiv.style.display = 'block';
+        
+        var offsetPosition = targetDiv.offsetTop;
+        window.scrollTo({
+            top:offsetPosition, // 計算滾動位置，這裡是螢幕高度的1倍
+            behavior: 'smooth' // 使用平滑滾動
+        });
+
+        document.getElementById('nearly-button').addEventListener('click', async function(event) {
+            event.stopPropagation();    
+         
+            // var title = '<h1 style="text-align: center;">景點之相關資訊</h1>';
+            var targetDiv = document.getElementById('nearly-all');
+            targetDiv.style.display = 'block';
+            targetDiv_close = document.getElementById('nearly_map');
+            if(targetDiv_close.style.display=='none')
+                targetDiv_close.style.display='block';
+
+            targetDiv_close = document.getElementById('nearly_data');
+            if(targetDiv_close.style.display=='block')
+                targetDiv_close.style.display='none';
+            
+            var offsetPosition = targetDiv.offsetTop;
+            await removeAllMarkers();
+        
+            //景點marker
+            var Marker_nearly;
+            // 已加入形成的景點  var locationRecords_x = [...locationRecords];
+            
+            let IconUrl_tri = '/static/select_tr2-icon.png';
+            var customIcon_tri = L.icon({
+                iconUrl: IconUrl_tri,
+                iconSize: [21, 21],
+                iconAnchor: [3.5, 0], 
+                popupAnchor: [6.5, 0], 
+            });
+            
+            
+            if(locationRecords.length>2){
+                for(var i = 2; i < locationRecords.length; i++){
+                        var loc = locationRecords[i];
+                        var lat_t = loc.latitude;
+                        var lon_t = loc.longitude;
+                        var locationName_t = loc.name;
+                        //if(locationName_t!=document.getElementById('start').textContent)
+                            //if(locationName_t!=document.getElementById('end').textContent)
+                                //createMarker(lat, lon, locationName, 'travel'+trv_id, otherIconUrl,true);
+                                Marker_nearly = L.marker([lat_t, lon_t], { icon: customIcon_tri}).addTo(nearly_map)
+                                .bindPopup(locationName_t, { className: 'custom-popup' })
+                                .on('popupopen', function() {
+                                    
+                                })
+                                .on('popupclose', function() {
+                                    // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+                                });
+                                nearly_markers.push(Marker_nearly);
+                    }
+            
+            }
+            
+            // 起點
+            locationNameS=document.getElementById('start').textContent
+            let IconUrl_start = 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/home-circle-blue-512.png';
+            var customIcon_start = L.icon({
+                iconUrl: IconUrl_start,
+                iconSize: [21, 21],
+                iconAnchor: [3.5, 0], 
+                popupAnchor: [6.5, 0], 
+            });
+            Marker_nearly = L.marker([lat_start, lon_start], { icon: customIcon_start}).addTo(nearly_map)
+            .bindPopup(locationNameS, { className: 'custom-popup' })
+            .on('popupopen', function() {
+                
+            })
+            .on('popupclose', function() {
+                // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+            });
+            nearly_markers.push(Marker_nearly);
+ 
+            //終點
+            locationNameE=document.getElementById('end').textContent
+            let IconUrl_end = 'https://cdn3.iconfinder.com/data/icons/social-messaging-ui-color-line/254000/87-512.png';
+            var customIcon_end = L.icon({
+                iconUrl: IconUrl_end,
+                iconSize: [21, 21],
+                iconAnchor: [3.5, 0], 
+                popupAnchor: [6.5, 0], 
+            });
+            Marker_nearly = L.marker([lat_end, lon_end], { icon: customIcon_end}).addTo(nearly_map)
+            .bindPopup(locationNameE, { className: 'custom-popup' })
+            .on('popupopen', function() {
+                
+            })
+            .on('popupclose', function() {
+                // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+            });
+            nearly_markers.push(Marker_nearly);
+
+
+           
+            await create_nearly_Marker(lat_Sum,lon_Sum,locationNameSum,IconUrl_2,csv_2);
+            await create_nearly_Marker(lat_Sum,lon_Sum,locationNameSum,IconUrl_3,csv_3);
+            //景點相關資訊之景點
+            let IconUrl_1 = '/static/nearly1-icon.png';
+            var customIcon_1 = L.icon({
+                iconUrl: IconUrl_1,
+                iconSize: [21, 21],
+                iconAnchor: [3, 0], 
+                popupAnchor: [6.5, 0], 
+            });
+            Marker_nearly = L.marker([lat_Sum, lon_Sum], { icon: customIcon_1}).addTo(nearly_map)
+            .bindPopup(locationNameSum, { className: 'custom-popup' })
+            .on('popupopen', function() {
+                
+            })
+            .on('popupclose', function() {
+                // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+            });
+            nearly_markers.push(Marker_nearly);
+           
+            nearly_map.setView([lat_Sum, lon_Sum], 13);
+            Marker_nearly.openPopup();
+            nearly_map.setView([lat_Sum, lon_Sum], 13);
+
+            window.scrollTo({
+                top:offsetPosition, // 計算滾動位置，這裡是螢幕高度的1倍
+                behavior: 'smooth' // 使用平滑滾動
+            });
+            
+            
+        });
+        
+    });
+    document.getElementById('nearly_data_button').addEventListener('click', async function(event) {
+                event.stopPropagation();
+                var button = document.getElementById('nearly_data_button');
+                var infor_n = document.getElementById('nearly_data');
+                infor_n.innerHTML='';   
+                
+                  
+                var title,csv_rh;
+                if (button.textContent === "餐廳相關資訊"){           
+                    title= '<h1 style="text-align: center;">[餐廳] ' + currentName_rh + ' 相關資訊</h1>';
+                    csv_rh='/static/Restaurant_C_f.csv';
+                }
+                else{  
+                    title= '<h1 style="text-align: center;">[住宿] ' + currentName_rh + ' 相關資訊</h1>';   
+                    csv_rh='/static/Hotel_C_f.csv';                     
+                }
+                // 更新信息容器的内容
+                infor_n.innerHTML+='<br/>';
+                infor_n.innerHTML +=  title;
+                infor_n.innerHTML+='<p style="height: 5px;"></p>';
+            
+                var rh_data = await place_information(currentName_rh,csv_rh);
+
+                infor_n.innerHTML += rh_data;
+                infor_n.innerHTML+='<br/>';
+                infor_n.innerHTML+='<br/>';
+                infor_n.style.display = 'block';
+                var offsetPosition = infor_n.offsetTop;
+                window.scrollTo({
+                    top:offsetPosition, // 計算滾動位置，這裡是螢幕高度的1倍
+                    behavior: 'smooth' // 使用平滑滾動
+                });                                              
+
+            });
+    function fetchRouteAndDisplay(startLon, startLat, endLon, endLat) {
+        return new Promise((resolve, reject) => {
+            fetch(`http://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&steps=true`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('API response data:', data); // Log the API response for debugging
+                if (!data.routes || data.routes.length === 0) {
+                    throw new Error('No routes found in response');
+                }
+
+                var route = data.routes[0];
+                var routeDescription = '';
+                var routeDuration = '';
+                var lastStepHadNameOrDestination = false;
+
+                if (route.duration) {
+                    const durationSeconds = route.duration;
+                    const hours = Math.floor(durationSeconds / 3600);
+                    const minutes = Math.floor((durationSeconds % 3600) / 60);
+                    routeDuration = `${hours} hours ${minutes} minutes`;
+                }
+
+                if (route.legs && route.legs.length > 0) {
+                    var legs = route.legs[0];
+                    if (legs.steps && legs.steps.length > 0) {
+                        legs.steps.forEach((step, index) => {
+                            const hasNameOrDestination = step.name || step.destinations;
+                            const arrow = (lastStepHadNameOrDestination && hasNameOrDestination) ? ' -> ' : '';
+                            const destination = step.destinations ? `(${step.destinations})` : '';
+                            
+                            if (index === 0) {
+                                routeDescription += `${step.name} ${destination}`;
+                            } else {
+                                routeDescription += `${arrow}${step.name} ${destination}`;
+                            }
+
+                            lastStepHadNameOrDestination = hasNameOrDestination;
+                        });
+                    } else {
+                        routeDescription = '<p>No route steps found.</p>';
+                    }
+                }
+
+                resolve({ description: routeDescription, duration: routeDuration });
+            })
+            .catch(error => {
+                console.error('Error fetching route:', error);
+                reject(error);
+            });
+        });
+    }
+   
+    document.getElementById('travel-button').addEventListener('click', async function() {
+        event.stopPropagation();
+        var contentR = document.getElementById('button_content');
+            if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+            }
+        contentR = document.getElementById('data-link');
+        if(contentR){ 
+            let con = document.getElementById('nearly-all');
+                    if(con.style.display ==='block'){
+                        con.style.display = 'none'; // 隱藏內容
+                        
+                    }
+
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                   
+                }
+               
+        }
+        contentR = document.getElementById('other-link');
+        if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+        }
+        /*
+        const coordinates = [ 
+            [120.822772,	24.5703846],	//苗栗火車站
+            [121.182,	24.7056],	//幻多奇另類博物館(新竹)
+            [121.179,	24.7052],	//橫山采風館
+            [121.18,	24.706],	//廣濟宮
+            [121.179,	24.706],	//櫻花園休閒農莊
+            [121.165,	24.7106],	//天人岩屋
+            [121.145,	24.6956], //老大份休閒農場
+            [121.139,	24.6893],	//騎龍古道
+            [121.14,	24.699],	//大崎崠古道
+            [121.183,	24.7056],	//好客好品希望工場
+            [121.0102,	24.64208],	//勸化堂
+            [121.051,	24.6514],	//老頭擺農庄
+            [121.02293,	24.65218],	//萬佛庵
+            [120.84908,	24.57949],	//徐府竹仔閣
+            [121.01373,	24.6437],	//海會庵
+            [121.01152,	24.64346],	//獅頭山古道
+            [121.012,	24.6427],	//元光寺
+            [121.21,	24.6787],	//山清休閒農園
+            [121.169,	24.7362]	//福沙大崎步道
+        ];*/
+        // 复制 locationRecords
+        /*let locationRecords_x = [...locationRecords];
+
+        // 交换第一笔和第二笔资料的位置
+        const temp = locationRecords_x[0];
+        locationRecords_x[0] = locationRecords_x[1];
+        locationRecords_x[1] = temp;
+
+        // 找到第二笔资料的索引位置
+        const secondRecordIndex = 1;
+        // 提取第二笔资料
+        const secondRecord = locationRecords.splice(secondRecordIndex, 1)[0];
+        // 将第二笔资料放到最后面
+        locationRecords.push(secondRecord);
+
+*/
+        //const startTime = performance.now();
+
+        const coordinates =  locationRecords.map(record => [record.longitude, record.latitude]);
+        const coordinates_name = locationRecords.map(record => [record.name]);
+
+        /*const coordinates = [
+            [121.31441317791153, 24.989080454213433], //桃園火車站
+            [121.78893, 24.44941],    // 南澳農場
+            [121.46603,	24.83442],   //雲森瀑布
+            [121.87052, 24.57706],    // 內埤海灣 
+            [121.35203,	24.94925],   //新北市立鶯歌陶瓷博物館
+            [121.82105, 24.46007],    // 朝陽漁港  
+            
+        ]; */
+
+        // 計算兩個坐標之間的距離（使用 Haversine 公式）
+        //結果與getDistance(lat1, lon1, lat2, lon2)相同
+        function calculateDistance(coord1, coord2) {
+            const R = 6371; // 地球半徑，單位：公里
+            const lat1 = coord1[1] * Math.PI / 180;
+            const lat2 = coord2[1] * Math.PI / 180;
+            const deltaLat = (coord2[1] - coord1[1]) * Math.PI / 180;
+            const deltaLon = (coord2[0] - coord1[0]) * Math.PI / 180;
+
+            const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                    Math.cos(lat1) * Math.cos(lat2) *
+                    Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c;
+        }
+        // 計算路徑的總距離
+        function calculateTotalDistance(path) {
+            let totalDistance = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                totalDistance +=  calculateDistance(path[i], path[i + 1]);
+            }
+            return totalDistance;
+        }
+
+        // 主函數：最遠插入法
+        function farthest_insert(coordinates)
+        {
+            const n = coordinates.length; // 獲取坐標(地點)數量
+            const route = [coordinates[0]]; // 初始路徑，只包含起始節點，後續會變多
+            const unvisited = coordinates.slice(1); // 未拜訪的節點列表(一開啟只有起點有拜訪過)
+
+            // 選擇與初始節點最遠的節點並加入路徑
+            let farthestIndex = 0;
+            let maxDistance = 0;
+            for (let i = 0; i < unvisited.length; i++) {
+                const distance = calculateDistance(route[0], unvisited[i]);
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                    farthestIndex = i;
+                }
+            }
+            route.push(unvisited.splice(farthestIndex, 1)[0]);
+
+            // 迭代直到所有節點都被插入路徑
+            // 當仍有未拜訪節點時，進入迴圈
+            while (unvisited.length > 0) {
+                // 找到與當前路徑上任一節點距離最遠的節點
+                // 對每個未拜訪的節點，找出與路徑上最近的節點距離的最小值，並找出最遠的未拜訪節點
+                let farthestIndex = 0;
+                let maxDistance = 0;
+                for (let i = 0; i < unvisited.length; i++) {
+                    let minDistance = Infinity;
+                    for (let j = 0; j < route.length; j++) {
+                        const distance = calculateDistance(route[j], unvisited[i]);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                        }
+                    }
+                    if (minDistance > maxDistance) {
+                        maxDistance = minDistance;
+                        farthestIndex = i;
+                    }
+                }
+
+                // 找到最佳插入點，以使路徑增加的距離最小。
+                const node = unvisited.splice(farthestIndex, 1)[0];
+                let bestInsertIndex = 0;
+                let bestIncrease = Infinity;
+                for (let i = 0; i < route.length - 1; i++) {
+                    const increase = calculateDistance(route[i], node) +
+                                    calculateDistance(node, route[i + 1]) -
+                                    calculateDistance(route[i], route[i + 1]);
+                    if (increase < bestIncrease) {
+                        bestIncrease = increase;
+                        bestInsertIndex = i + 1;
+                    }
+                }
+
+                // 將節點插入最佳位置
+                route.splice(bestInsertIndex, 0, node);
+            }
+            // 將起點添加到路徑末尾以完成回程
+            route.push(coordinates[0]);
+            const bestDistance = calculateTotalDistance(route);
+            return { bestPath: route, bestDistance: bestDistance };
+
+        }
+
+        // 測試函數並計算所需時間
+       
+        
+        const result = farthest_insert(coordinates);
+        
+        //得到結果，取代回原本的順序
+        // 将 result.bestPath 转换成类似 coordinates 的形式
+        
+        const coordinates2 = result.bestPath.map(coord => [coord[0], coord[1]]);
+        // 创建 coordinates_name2 数组
+        const coordinates_name2 = coordinates2.map(coord2 => {
+            const index = coordinates.findIndex(coord => coord[0] === coord2[0] && coord[1] === coord2[1]);
+            return coordinates_name[index];
+        });
+        //alert(`最佳路徑座標：\n${coordinates2.map(coord => `(${coord[0]}, ${coord[1]})`).join('\n')}`);
+        //alert(coordinates2.length);
+
+        //const colors = ['blue', 'red', 'green', 'purple', 'orange','yellow','cyan'];
+        const colors = [
+            'blue', 'red', 'green', 'purple', 'orange', 'yellow', 'cyan',
+            'magenta', 'teal', 'lime', 'brown', 'maroon', 'navy', 'olive',
+            'orchid', 'sienna', 'slateblue', 'tomato', 'turquoise', 'violet',
+            'chocolate', 'coral', 'crimson', 'darkcyan', 'darkgoldenrod',
+            'darkgreen', 'darkmagenta', 'darkorange', 'indigo', 'khaki'
+        ];
+
+        async function fetchRouteAndDisplay3(startLon, startLat, endLon, endLat, color) {
+        try {
+            const response = await fetch(`http://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`);
+            const data = await response.json();
+            if (data.code === 'Ok') {
+                return data.routes[0];
+            } else {
+                throw new Error('No route found');
+            }
+        } catch (error) {
+            console.error('Error fetching route:', error);
+            throw error;
+        }
+        }
+        var container = document.getElementById('button_content_route');
+        container.innerHTML = '';
+        // 设置页面标题
+        container.innerHTML = `
+            <h1 style="text-align: center; ">
+                起點到主要想去的目的地之行程規畫(交通方式:自行開車)
+            </h1>
+            <p style="height: 1px;"></p>
+        `;
+
+        async function displayRoutes() {
+            try {
+                // 顯示路徑描述
+                // 假設 markers 是一個包含多個 marker 的物件
+            function removeUnwantedMarkers() {
+                for (const formName in markers) {
+                    if (markers.hasOwnProperty(formName)) {
+                       
+                        const markerName = marker.getPopup().getContent();
+
+                        // 檢查 locationRecords 中是否存在與 markerName 匹配的項目
+                        const recordExists = locationRecords.some(record => record.name === markerName);
+
+                        // 如果 name 不在 locationRecords 中，移除該 marker
+                        if (!recordExists) {
+                            map.removeLayer(marker);
+                            delete markers[formName];
+                        }
+                    }
+                }
+            }
+            var formName = 'midForm';
+            // 遍歷所有 markers
+            for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^midForm\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+            }
+            formName='aroundForm';
+            for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^aroundForm\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+            }
+            formName = 'travel';
+            for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^travel\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+            }
+            /*
+            formName = 'travelx';
+            for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^travelx\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+            }*/
+            /*
+            for (let i = 0; i < 40; i++) {
+                let currentFormName = formName + i;
+                let marker = markers[currentFormName];
+
+                if (marker) {  // 確保 marker 存在
+                    map.removeLayer(marker);  // 從地圖上移除 marker
+                    delete markers[currentFormName];  // 從 markers 對象中刪除 marker
+                }
+            }    
+            */
+                // 呼叫函數移除不在 markers 物件中的 marker
+               
+
+                let otherIconUrl = '/static/select_tr2-icon.png';
+                for(var i = 0; i < locationRecords.length; i++){
+                    var loc = locationRecords[i];
+                    var lat = loc.latitude;
+                    var lon = loc.longitude;
+                    var locationName = loc.name;
+                    var trv_id = i;
+                    if(locationName!=document.getElementById('start').textContent)
+                        if(locationName!=document.getElementById('end').textContent)
+                            createMarker(lat, lon, locationName, 'travel'+trv_id, otherIconUrl,true);
+                }
+                /*
+                locationRecords.push({
+                    name: locationName,
+                    latitude: latLng.lat,
+                    longitude: latLng.lng
+                });    
+                */
+                clearRoutes();
+                var pathDescription = '<p style="font-size: 13px;font-weight: bold; text-align: center;">《  路徑: ';
+                coordinates_name2.forEach((name, idx) => {
+                    if (idx === 0) {
+                        pathDescription += `${name} (起點)`;
+                    } else if (idx === coordinates_name2.length - 1) {
+                        pathDescription += ` -> ${name} (回程結束)  》`;
+                    } else {
+                        pathDescription += ` -> ${name}`;
+                    }
+                });
+                pathDescription += '</p>';
+
+                container.innerHTML += pathDescription;
+                container.innerHTML += '<br/>';
+                
+                var TotalrouteDuration=0;
+                // 解析 "0 hours 7 minutes" 格式的時間字串為秒數
+                function parseDuration(durationStr) {
+                    if (!durationStr || typeof durationStr !== 'string') {
+                        console.error("無效的時間字串格式:", durationStr);
+                        return 0;
+                    }
+
+                    let hours = 0, minutes = 0;
+                    const hoursMatch = durationStr.match(/(\d+)\s*hours/); // 匹配 "hours"
+                    const minutesMatch = durationStr.match(/(\d+)\s*minutes/); // 匹配 "minutes"
+
+                    if (hoursMatch) {
+                        hours = parseInt(hoursMatch[1], 10); // 解析小時數字
+                    }
+                    if (minutesMatch) {
+                        minutes = parseInt(minutesMatch[1], 10); // 解析分鐘數字
+                    }
+
+                    return (hours * 3600) + (minutes * 60); // 返回總秒數
+                }
+                async function processRoutes() {
+                    // 依序處理每段路徑
+                    for (let index = 0; index < coordinates2.length - 1; index++) {
+                        const coords = coordinates2[index];
+                        const [startLon, startLat] = coords;
+                        const [endLon, endLat] = coordinates2[index + 1];
+                        const color = colors[index % colors.length];
+
+                        // 取得並顯示正向路徑
+                        const route = await fetchRouteAndDisplay3(startLon, startLat, endLon, endLat, color);
+                        const routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                        const routeLayer = L.polyline(routeCoordinates, { color: color }).addTo(map);
+                        map.fitBounds(routeLayer.getBounds());
+                        routes.push(routeLayer);
+
+                        const routeData = await fetchRouteAndDisplay(startLon, startLat, endLon, endLat);
+                        const routeDescription = routeData.description;
+                        const routeDuration = routeData.duration;
+                        // 將字串轉換為秒數
+                        const routeDuration_p = parseDuration(routeDuration);
+                        TotalrouteDuration += routeDuration_p; // 累加每段路徑的秒數
+                        
+                        // 顯示正向路徑描述
+                        /*
+                        container.innerHTML += `
+                            <div class="route-description" style="font-size: 12px;font-weight: bold;color: ${color};">
+                                [${coordinates_name2[index]}] -> ${routeDescription} -> [${coordinates_name2[index + 1]}]
+                            </div>
+                            <p style="font-size: 12px;">預計時間: ${routeDuration}</p>
+                        `;
+                        */
+                        container.innerHTML  += `
+                            <div class="route-description" style="font-size: 12px;font-weight: bold;color: ${color};">
+                                [${coordinates_name2[index]}] -> ${routeDescription} -> [${coordinates_name2[index + 1]}]
+                            </div>
+                            <p style="font-size: 12px;">預計時間: ${routeDuration}</p>
+                        `;
+                        var targetDiv = document.getElementById('button_content_route');
+                        var offsetPosition = targetDiv.offsetTop;
+                        window.scrollTo({
+                            top:offsetPosition * 1, // 計算滾動位置，這裡是螢幕高度的1倍
+                            behavior: 'smooth' // 使用平滑滾動
+                        });
+
+                    }
+
+                // 將總時間從秒數轉換為小時和分鐘
+                const totalHours = Math.floor(TotalrouteDuration / 3600); // 1 小時 = 3600 秒
+                const totalMinutes = Math.floor((TotalrouteDuration % 3600) / 60); // 1 分鐘 = 60 秒
+                
+                // 將格式化的時間插入到 HTML 中              
+                container.innerHTML +=`<div style="height: 3px;"></div>`;
+                container.innerHTML += `<p style="font-size: 12px;font-weight: bold;">總預計時間: ${totalHours} hours ${totalMinutes} minutes</p><br/>`;
+                container.innerHTML  += '<br/>';
+
+                }
+                // 執行路徑處理
+                processRoutes();
+
+            } catch (error) {
+                console.error('Error displaying routes:', error);
+            }
+        }
+
+        // 執行顯示路徑函式
+        displayRoutes();
+
+        //const endTime = performance.now();
+        //const totalTime = endTime - startTime;
+        //alert(`計算時間：${totalTime.toFixed(2)} 毫秒`)
+        
+        container = document.getElementById('button_content_route');
+           
+        container.style.display = 'block'; // 顯示內容
+        
+        
+            
+});
+            // 获取并绘制路线的函数
+    function fetchRouteAndDisplay2(startLon, startLat, endLon, endLat) {
+                return fetch(`http://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 'Ok') {
+                            return data.routes[0];
+                        } else {
+                            throw new Error('No route found');
+                        }
+                    });
+    }
+    // 函數用於刪除所有路徑
+    function clearRoutes() {
+            routes.forEach(function(route) {
+                map.removeLayer(route);  // 從地圖上移除路徑
+            });
+            routes = [];  // 清空數組
+        }
+    document.getElementById('road-button').addEventListener('click', function() {
+        event.stopPropagation();
+        var contentR = document.getElementById('button_content');
+            if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+            }
+        contentR = document.getElementById('data-link');
+        if(contentR){
+            let con = document.getElementById('nearly-all');
+                    if(con.style.display ==='block'){
+                        con.style.display = 'none'; // 隱藏內容
+                       
+                    }
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                   
+                }
+                
+        }
+        contentR = document.getElementById('other-link');
+        if(contentR){
+                if(contentR.style.display ==='block'){
+                    contentR.style.display = 'none'; // 隱藏內容
+                }
+        }
+        var content = document.getElementById('button_content_route');
+        content.style.display = 'block';
+        clearRoutes();
+        /*
+        var formName = 'travel';
+        for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^travel\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+            }
+        */
+        /*
+        formName = 'travelx';
+        for (let key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    if (/^travelx\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                        let marker = markers[key];
+
+                        // 確保 marker 存在
+                        if (marker) {
+                            map.removeLayer(marker);  // 從地圖上移除 marker
+                            delete markers[key];     // 從 markers 對象中刪除 marker
+                        }
+                    }
+                }
+        }*/
+        if (locationRecords!=null) {
+            // 清空之前的内容
+            var content = document.getElementById('button_content_route');
+            content.innerHTML = '';
+            // 添加标题
+            var title = '<h1 style="text-align: center; font-size: 15px;">起點到主要想去的目的地之路徑(交通方式:自行開車)</h1>';
+            content.innerHTML += title;
+
+            var latLng1 = markers['searchForm'].getLatLng(); // start location
+            var latLng2 = markers['otherSearchForm'].getLatLng(); // end location
+            var start_name = markers['searchForm'].getPopup().getContent(); // start name
+            var end_name = markers['otherSearchForm'].getPopup().getContent(); // end name
+
+            var lat1 = latLng1.lat; // 緯度
+            var lon1 = latLng1.lng; // 經度
+            var lat2 = latLng2.lat;
+            var lon2 = latLng2.lng;
+
+            // 调用获取路线描述的函数
+            fetchRouteAndDisplay(lon1, lat1, lon2, lat2).then(routeData => {
+                // Extract route description and duration from the returned routeData object
+                const routeDescription = routeData.description;
+                const routeDuration = routeData.duration;
+
+                // 将路线描述和时间写入内容区域
+                content.innerHTML += `<div class="route-description" style="font-size: 12px; font-weight: bold;">
+                    <span style="color: red;">${start_name}</span> -><br>
+                    ${routeDescription}<br>
+                    -> <span style="color: blue;">${end_name}</span>
+                </div>`;
+                content.innerHTML += `<p style="font-size: 12px; font-weight: bold;">預計時間: ${routeDuration}</p>`;
+                window.scrollTo({
+                    top: 500, // 計算滾動位置，這裡是螢幕高度的1倍
+                    behavior: 'smooth' // 使用平滑滾動
+                });
+
+
+            }).catch(error => {
+                // 处理获取路线描述失败的情况
+                console.error('Error fetching route description:', error);
+                content.innerHTML += '<p>Error fetching route description: ' + error.message + '</p>';
+            });
+
+            // 获取并绘制路线
+            fetchRouteAndDisplay2(lon1, lat1, lon2, lat2).then(route => {
+                var routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                var routeLayer = L.polyline(routeCoordinates, { color: 'black' }).addTo(map);
+                map.fitBounds(routeLayer.getBounds());
+                routes.push(routeLayer);
+               
+            }).catch(error => {
+                console.error('Error fetching route:', error);
+            });
+            
+        } else {
+            alert('尚未建立end maker或start maker');
+        }
+        
+        content = document.getElementById('button_content_route');
+            
+        content.style.display = 'block'; // 顯示內容
+       
+
+    });
+
+    document.getElementById('around-button').addEventListener('click', function() {
+        if(!markers['aroundForm0']){
+            /*
+            var formName = 'travel';
+            for (let key in markers) {
+                    if (markers.hasOwnProperty(key)) {
+                        if (/^travel\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                            let marker = markers[key];
+
+                            // 確保 marker 存在
+                            if (marker) {
+                                map.removeLayer(marker);  // 從地圖上移除 marker
+                                delete markers[key];     // 從 markers 對象中刪除 marker
+                            }
+                        }
+                    }
+                }
+                */
+            // 使用 Fetch API 读取 CSV 文件
+            fetch('/static/data_Attractions.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    // 解析 CSV 数据
+                    let rows = csvData.split('\n');
+                    let headers = rows[0].split(',');
+                    let data = [];
+
+                    // 解析每一行数据
+                    for (let i = 1; i < rows.length; i++) {
+                        let values = rows[i].split(',');
+                        if (values.length === headers.length) {
+                            let obj = {};
+                            for (let j = 0; j < headers.length; j++) {
+                                obj[headers[j]] = values[j];
+                            }
+                            data.push(obj);
+                        }
+                    }
+
+                    // 在数据加载完成后处理
+                    processMatchedIds(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                });
+        }
+        else{
+            var marker = markers['aroundForm0'];
+                if (marker) {
+                    // 使用 getLatLng() 方法獲取 marker 的經緯度
+                    var latLng = marker.getLatLng();
+                    var lat = latLng.lat;
+                    var lon = latLng.lng;
+                    map.setView([lat, lon], 10);
+                }
+        }
+        
+    });
+    //新增end的周圍景點
+    function processMatchedIds(data) {
+
+        if (markers['otherSearchForm']) {
+            // 查找匹配的位置信息
+            ard_id=0;
+            var matchedLocation = data.filter(item => item.Name.includes(markers['otherSearchForm'].getPopup().getContent()));
+            
+            if (matchedLocation.length > 0) { // 只有在找到匹配位置信息时才执行后续操作
+                matchedLocation.forEach(location => {
+                    var id1 = location.comp1;
+                    var id2 = location.comp2;
+                    var id3 = location.comp3;
+                    var id4 = location.comp4;
+                    var id5 = location.comp5;
+                    var id6 = location.comp6;
+                    var id7 = location.comp7;
+                    var id8 = location.comp8;
+                    var id9 = location.comp9;
+                    var id10 = location.comp10;
+                    
+                    var idsArray = [id1, id2, id3, id4, id5, id6, id7, id8, id9, id10];
+                    let lat;
+                    let lon;
+                    idsArray.forEach(id => {
+
+                        var matchedId = data.find(item => item.Id.toString() === id.toString());
+                        if (matchedId) {
+                            if(id=='undefinded')
+                                alert('找不到');
+                            lat = parseFloat(matchedId.Py);
+                            lon = parseFloat(matchedId.Px);
+                            let otherIconUrl = '/static/around-icon.png';
+                            createMarker(lat, lon, matchedId.Name.toString(), 'aroundForm'+ard_id, otherIconUrl);
+                            ard_id++;
+                        }
+                        
+                    });
+                    var marker = markers['aroundForm0'];
+                    var latLng = marker.getLatLng();
+                    var lat1 = latLng.lat;
+                    var lon1 = latLng.lng;
+                    map.setView([lat1, lon1], 10);
+                });
+            } else {
+                alert('尚未找到匹配位置信息');
+            }
+        } else {
+            alert('尚未建立end marker');
+        }
+    }
+
+    document.getElementById('mid-button').addEventListener('click', function() {
+       
+        if (markers['otherSearchForm']&&markers['searchForm']){
+            if(!markers['midForm0']){
+                /*
+                var formName = 'travel';
+            for (let key in markers) {
+                    if (markers.hasOwnProperty(key)) {
+                        if (/^travel\d+$/.test(key)) {  // 使用正則表達式匹配標記名稱
+                            let marker = markers[key];
+
+                            // 確保 marker 存在
+                            if (marker) {
+                                map.removeLayer(marker);  // 從地圖上移除 marker
+                                delete markers[key];     // 從 markers 對象中刪除 marker
+                            }
+                        }
+                    }
+                }      */
+            var latLng1 = markers['searchForm'].getLatLng();//sart location
+            var latLng2 = markers['otherSearchForm'].getLatLng();//end location
+            var end_name = markers['otherSearchForm'].getPopup().getContent();//end name
+
+            var lat1=latLng1.lat;//緯度
+            var lon1=latLng1.lng;//經度
+            var lat2=latLng2.lat;
+            var lon2=latLng2.lng;
+
+            // 使用 Fetch API 读取 CSV 文件
+            fetch('/static/data_Attractions.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    // 解析 CSV 数据
+                    let rows = csvData.split('\n');
+                    let headers = rows[0].split(',');
+                    let data = [];
+
+                    // 解析每一行数据
+                    for (let i = 1; i < rows.length; i++) {
+                        let values = rows[i].split(',');
+                        if (values.length === headers.length) {
+                            let obj = {};
+                            for (let j = 0; j < headers.length; j++) {
+                                obj[headers[j]] = values[j];
+                            }
+                            data.push(obj);
+                        }
+                    }
+                    var lat=0;
+                    var lon=0;
+                    mid_id=0;
+                    // 在数据加载完成后处理
+                    var closestLocations=cul_mid_location(data,end_name,lat1,lon1,lat2,lon2);
+                    closestLocations.forEach(location => {
+                        // 取得地點的 Id 和距離
+                        var locationId = location.Id;
+                        var matchedLocation = data.find(item => item.Id===locationId);
+                        lat = parseFloat(matchedLocation.Py);//緯度
+                        lon = parseFloat(matchedLocation.Px);//經度
+                        var mid_name = matchedLocation.Name.toString();//經度
+
+                        var otherIconUrl = 'https://cdn3.iconfinder.com/data/icons/social-messaging-ui-color-shapes-2-1/254000/78-512.png';
+                        //var otherIconUrl = '/static/select_mid-icon.png';
+                        createMarker(lat, lon,  mid_name , 'midForm'+mid_id, otherIconUrl);
+                        mid_id++;
+                    });
+                    var marker = markers['midForm0'];
+                    var latLng = marker.getLatLng();
+                    var lat = latLng.lat;
+                    var lon = latLng.lng;
+                    map.setView([lat, lon], 12);
+                })
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                });
+            }
+            else{
+                var marker = markers['midForm0'];
+                if (marker) {
+                    // 使用 getLatLng() 方法獲取 marker 的經緯度
+                    var latLng = marker.getLatLng();
+                    var lat = latLng.lat;
+                    var lon = latLng.lng;
+                    map.setView([lat, lon], 12);
+                }
+            } 
+
+        }else {
+                alert('尚未建立end maker或start maker');
+        }
+
+    })
+    // 計算兩個經緯度之間的距離（使用球面三角形法）
+    function getDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371; // 地球半徑（公里）
+        var dLat = deg2rad(lat2 - lat1);
+        var dLon = deg2rad(lon2 - lon1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var distance = R * c; // 距離（公里）
+        return distance;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    function cul_mid_location(data,end_name,lat1,lon1,lat2,lon2)
+    {
+        var matchedLocation = data.find(item => item.Name===end_name);
+        if (matchedLocation) {
+            var end_id = parseInt(matchedLocation.Id)
+
+            // 剔除結束位置，以免重複計算
+            var filteredData = data.filter(item => item.Id !== matchedLocation.Id);
+            // 計算每個地點到 start 與 end 的距離，並將結果存儲在一個陣列中
+            var distances = filteredData.map(item => {
+                var lat = parseFloat(item.Py);
+                var lon = parseFloat(item.Px);
+                var distance1 = getDistance(lat1, lon1, lat, lon);
+                var distance2 = getDistance(lat2, lon2, lat, lon);
+                return { Id: item.Id, Distance: distance1 + distance2 }; //取總距離
+            });
+            // 按距離升序排序
+            distances.sort((a, b) => a.Distance - b.Distance);
+             // 取前五個最近的地點
+            var closestLocations = distances.slice(0, 10);
+            // 返回結果
+            return closestLocations;
+        }
+        else
+        {
+            alert('未找到end匹配位置');
+            return null;
+        }
+    }
+
+    var markers = {};
+    function clearmap()
+    {
+         if (map) {
+            map.remove();
+            // 清除地图容器的内容
+
+
+            map = L.map('map').setView([25.033, 121.565], 12);
+            map.setMinZoom(6.5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            otherSearchForm = document.getElementById('otherSearchForm');
+            customButton = document.getElementById('custom-button');
+            summaryButton = document.getElementById('summary-button');
+            currentMarker = null; // 用于跟踪当前的标记对象
+            locationRecords = [];
+            ard_id = 0;
+            mid_id=0;
+            tr_id=0;
+        }
+    }
+
+
+    function handleOtherSearchForm() {
+        
+        // 获取输入的兩個(start與end)位置信息
+        if(document.getElementById('start'))
+        var location = document.getElementById('start').textContent;;
+        if(document.getElementById('end'))
+        var otherLocation = document.getElementById('end').textContent;;
+
+        // 如果起始位置和结束位置相同，则阻止表单提交
+        if (otherLocation === location) {
+            alert('End Location不能與Start Location相同！請更改!');
+            return;
+        }
+        
+
+        //start marker採用 OpenStreetMap Nominatim 服务进行地理编码
+            fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + location + '&viewbox=120.0,21.8,122.1,25.5')
+                    .then(response => response.json())
+                    .then(data => {
+                        // 获取第一个结果的经纬度坐标
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        lat_start=lat;
+                        lon_start=lon;
+                        // 创建第二个标记，使用不同的图标
+                        createMarker(lat, lon, location, 'searchForm');//這個要有，2082~2096都需要by月幻
+                        // 先保存原有的資料
+                        const savedRecords = locationRecords.slice();
+                        // 清空 locationRecords 陣列
+                        locationRecords.length = 0;
+
+                        locationRecords.push({
+                            name: location,
+                            latitude: lat,
+                            longitude: lon
+                        });
+
+                        savedRecords.forEach(record => {
+                            locationRecords.push(record);
+                        });
+                    })
+                    .catch(error => {
+                        alert('抱歉此位置無法找到\n請更換景點名稱');
+                        console.error('Error:', error);
+                    });
+
+        // end marker使用 Fetch API 读取 CSV 文件
+            fetch('/static/data_Attractions.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    // 解析 CSV 数据
+                    let rows = csvData.split('\n');
+                    let headers = rows[0].split(',');
+                    let data = [];
+
+                    // 解析每一行数据
+                    for (let i = 1; i < rows.length; i++) {
+                        let values = rows[i].split(',');
+                        if (values.length === headers.length) {
+                            let obj = {};
+                            for (let j = 0; j < headers.length; j++) {
+                                obj[headers[j]] = values[j];
+                            }
+                            data.push(obj);
+                        }
+                    }
+                    
+                    // 查找匹配的位置信息
+                    var matchedLocation = data.find(item => item.Name === otherLocation);
+                    if (matchedLocation) {
+                        // 获取匹配位置的经纬度坐标
+                        var lat = parseFloat(matchedLocation.Py);//緯度
+                        var lon = parseFloat(matchedLocation.Px);//經度
+                        lat_end=lat;
+                        lon_end=lon;
+                        // 创建第二个标记，使用不同的图标
+                        var otherIconUrl = 'https://cdn3.iconfinder.com/data/icons/social-messaging-ui-color-line/254000/87-512.png'; // 替换为您的其他图标文件路径
+                        createMarker(lat, lon, otherLocation, 'otherSearchForm', otherIconUrl);
+                        locationRecords.push({
+                            name: otherLocation,
+                            latitude: lat,
+                            longitude: lon
+                        });
+                    } 
+                })
+                .catch(error => {
+                    console.error('Error fetching CSV:', error);
+                });
+        }
+
+
+
+    // 创建标记的函数
+    function createMarker(lat, lon, location, formName, iconUrl = 'https://cdn0.iconfinder.com/data/icons/social-messaging-ui-color-shapes/128/home-circle-blue-512.png',isTopMarker = false) {
+        var customIcon = L.icon({
+            iconUrl: iconUrl,
+            iconSize: [18, 18],
+            iconAnchor: [2, 0], 
+            popupAnchor: [6.5, 0], 
+        });
+        // 初始化当前标记对象为空
+        //var currentMarker = null; 
+        const a = document.getElementById('summary-button');
+        const b = document.getElementById('custom-button');
+        
+        customButton.style.display = 'block';
+        summaryButton.style.display = 'block';
+           
+        const originalTop = window.getComputedStyle(a).top;
+        const originalTop2 = window.getComputedStyle(b).top;
+        
+        
+        customButton.style.display = 'none';
+        summaryButton.style.display = 'none';    
+
+        Marker = L.marker([lat, lon], { icon: customIcon, zIndexOffset: isTopMarker ? 1000 : 0 }).addTo(map)
+            .bindPopup(location, { className: 'custom-popup' })
+            .on('popupopen', function() {
+                // 当位置信息弹出窗口打开时显示“加入我的最爱”按钮
+                if(formName!="searchForm"&&formName!="otherSearchForm")
+                    customButton.style.display = 'block';
+                if(formName!="searchForm")
+                    summaryButton.style.display = 'block';
+
+                if(formName=="otherSearchForm")
+                {
+                    // 更改summaryButton位置(上移)                   
+                    // 修改 a 的 CSS 位置，使其匹配 b 的位置
+                    //alert(`${rect.top}vw`)                  
+                    a.style.top = originalTop2;
+                }
+                //currentMarker = Marker;
+                //if(formName!='aroundForm')
+                currentFormName = formName; 
+            })
+            .on('popupclose', function() {
+                // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+                if(formName=="otherSearchForm")
+                {
+                    //恢復summaryButton位置(下移)
+                        a.style.top = originalTop;                    
+                }
+                customButton.style.display = 'none';
+                summaryButton.style.display = 'none';
+                
+                //currentMarker = null;
+                //if(formName!='aroundForm')
+                currentFormName = null;
+            });
+
+            /*
+            if (formName.includes('travel')) {
+                Marker.addTo(topLayerGroup); // 添加到 topLayerGroup
+            } else {
+                Marker.addTo(normalLayerGroup); // 添加到 normalLayerGroup
+            }
+            function updateLayerOrder() {
+                // 確保 topLayerGroup 在 normalLayerGroup 上面
+                if (!map.hasLayer(topLayerGroup)) {
+                    map.addLayer(topLayerGroup);
+                }
+                if (!map.hasLayer(normalLayerGroup)) {
+                    map.addLayer(normalLayerGroup);
+                }
+            }
+            // 調用 updateLayerOrder 來確保圖層順序
+            updateLayerOrder();
+            */
+        // 将标记对象存储在 markers 对象中，使用表单名称作为键值
+        if(formName=='searchForm'||formName=='otherSearchForm')
+        {
+            markers[formName] = Marker;
+            // 将地图视图移动到标记位置
+            map.setView([lat, lon], 12);
+
+           /* if (markers['searchForm']&&markers['otherSearchForm'])
+            {
+                alert('起點與主要想去的目的地 的地圖標示已建立\n請縮小查看兩地點位置');    
+            }*/
+        }
+        else 
+        {
+            markers[formName]= Marker;  
+        }
+        
+    }
+        // 创建标记的函数
+    async function create_nearly_Marker(lat, lon, name, icon, csv) {
+        event.stopPropagation();
+        var Icon = L.icon({
+            iconUrl: icon,
+            iconSize: [30, 30],
+            iconAnchor: [7, 0], 
+            popupAnchor: [6.5, 0], 
+        });
+        
+        fetch(csv)
+            .then(response => response.text())
+            .then(csvData => {
+                // 解析 CSV 数据
+                var rows = csvData.split('\n');
+                var headers = rows[0].split(',');
+                var data = [];
+            
+                // 解析每一行数据
+                for (let i = 1; i < rows.length; i++) {
+                    var values = rows[i].split(',');
+                    if (values.length === headers.length) {
+                        var obj = {};
+                        for (let j = 0; j < headers.length; j++) {
+                            obj[headers[j]] = values[j];
+                        }
+                        data.push(obj);
+                    }
+                }
+                var search_csv;
+                if (csv=== '/static/Restaurant_cut.csv')
+                {
+                    search_csv='/static/Restaurant_C_f.csv';
+                }
+                else
+                    search_csv='/static/Hotel_C_f.csv';
+        
+                // 在数据加载完成后处理
+                var matchedLocation = data.filter(item => item.Name.includes(name));
+                
+                if (matchedLocation.length > 0) {
+                    matchedLocation.forEach(location => {
+                    var id1 = location.comp1;
+                        var id2 = location.comp2;
+                        var id3 = location.comp3;
+                        var id4 = location.comp4;
+                        var id5 = location.comp5;
+                        var id6 = location.comp6;
+                        var id7 = location.comp7;
+                        var id8 = location.comp8;
+                        var id9 = location.comp9;
+                        var id10 = location.comp10;
+                        
+                        var idsArray = [id1, id2, id3, id4, id5, id6, id7, id8, id9, id10];
+                        fetch(search_csv)
+                            .then(response => response.text())
+                            .then(csvData => {
+                                        // 解析 CSV 数据
+                                        var rows = csvData.split('\n');
+                                        var headers = rows[0].split(',');
+                                        var data2 = [];
+                                    
+                                        // 解析每一行数据
+                                        for (let i = 1; i < rows.length; i++) {
+                                            var values = rows[i].split(',');
+                                            if (values.length === headers.length) {
+                                                var obj = {};
+                                                for (let j = 0; j < headers.length; j++) {
+                                                    obj[headers[j]] = values[j];
+                                                }
+                                                data2.push(obj);
+                            }
+                            }  
+                        idsArray.forEach(id => {
+                            var matchedId = data2.find(item => item.Id.toString() === id.toString());
+                            if (matchedId) {
+                                if (id === 'undefined') {
+                                    alert('找不到');
+                                    return; // Skip further processing if id is undefined
+                                }
+
+                                var lat_n = parseFloat(matchedId.Py);
+                                var lon_n = parseFloat(matchedId.Px);
+
+                                var locationId = matchedId.Id;
+                                     
+                                        var mLocation = data2.find(item => item.Id===locationId);
+                                        var rh_name = mLocation.Name.toString();//經度
+
+                                        var Marker = L.marker([lat_n, lon_n], { icon: Icon }).addTo(nearly_map)
+                                            .bindPopup(rh_name, { className: 'custom-popup' })
+                                            .on('popupopen', function() {
+                                                // 修改按鈕內的文字
+                                                var button = document.getElementById('nearly_data_button');
+                                                if (csv === '/static/Restaurant_cut.csv') {
+                                                    button.textContent = "餐廳相關資訊";
+                                                } else {
+                                                    button.textContent = "住宿相關資訊";
+                                                }
+                                                button.style.display = 'block';
+                                                currentName_rh = rh_name; 
+                                            })
+                                            .on('popupclose', function() {
+                                                // 当位置信息弹出窗口关闭时隐藏“加入我的最爱”按钮
+                                                var button = document.getElementById('nearly_data_button');
+                                                button.style.display = 'none';
+                                                currentName_rh = null; 
+                                            });
+                                            nearly_markers.push(Marker); 
+
+
+                                        
+                                    }   
+                                }).catch(error => {
+                                        console.error('Error fetching CSV:', error);
+                                    });  
+                        });
+                    });
+                } else {
+                    alert('尚未找到匹配位置信息');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching CSV:', error);
+            });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var startStation = localStorage.getItem('startStation');
+        var destination = localStorage.getItem('destination');
+        
+        // 設定出發站
+        if (startStation) {
+            document.getElementById('start').textContent = startStation+"火車站";
+        }
+    
+        // 設定目的地，統一使用 destination
+        if (destination) {
+            document.getElementById('end').textContent = destination;
+        }
+    
+        handleOtherSearchForm();
+    });
+    
+</script>
+
+</body>
+</html>

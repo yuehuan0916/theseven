@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <title>旅遊資訊</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>旅行推薦系統</h1>
+        <h2>以下是您填寫的資料</h2>
+        <p><strong>起點:</strong> {{ station }}車站</p>
+        <p><strong>景點:</strong> {{ address }}</p>
+        <button type="submit" id="submitRoadForm">確認</button>
+        <button onclick="goBack()">返回上一頁</button>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

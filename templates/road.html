@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>路線圖</title>
+    <style>
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>路線圖</h1>
+    <p>所選的景點:</p>
+        {% for place in selected_places %}
+            <p>{{ place }}</p>
+        {% endfor %}
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ place['名稱'] }} - 詳細資訊</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color:#9ddaff;
+        }
+        h1 {
+            text-align: center;
+        }
+        .info {
+            margin-top: 20px;
+            text-align: center;
+            padding:30px;
+        }
+        .info p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .summary-content {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .summary-content p {
+            margin: 0;
+        }
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #cc7c93;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-back:hover {
+            background-color: #B87070;
+        }
+        button{
+            background-color: #cc7c93;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn-back" onclick="goBack()">返回上一頁</button>
+    <h1>{{ place['名稱'] }}</h1>
+    <div class="info">
+        <p><strong>網址:</strong> {% if place['website'] %}<a href="{{ place['website'] }}" target="_blank">{{ place['website'] }}</a>{% else %}暫無資料{% endif %}</p>
+        <p><strong>地址:</strong> {{ place['address'] }}</p>
+        <p><strong>電話:</strong> {{ place['tellphone'] }}</p>
+        <p><strong>營業時間:</strong> {{ place['Opentime'] }}</p>
+        
+        <!-- 新增摘要按鈕 -->
+        <button onclick="toggleSummary('summary1')">摘要1</button>
+        <button onclick="toggleSummary('summary2')">摘要2</button>
+        <button onclick="toggleSummary('summary3')">摘要3</button>
+
+        <!-- 新增摘要內容區塊 -->
+        <div id="summary1" class="summary-content">
+            <p>{{ place['Summary1'] }}</p>
+        </div>
+        <div id="summary2" class="summary-content">
+            <p>{{ place['Summary2'] }}</p>
+        </div>
+        <div id="summary3" class="summary-content">
+            <p>{{ place['Summary3'] }}</p>
+        </div>
+
+        <p><strong>簡介:</strong> {{ place['Toldescribe'] }}</p>
+    </div>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function toggleSummary(id) {
+            // 隱藏所有摘要內容
+            const summaries = document.querySelectorAll('.summary-content');
+            summaries.forEach(summary => {
+                if (summary.id !== id) {
+                    summary.style.display = 'none';
+                }
+            });
+
+            // 切換指定摘要的顯示狀態
+            const summary = document.getElementById(id);
+            if (summary.style.display === 'none' || summary.style.display === '') {
+                summary.style.display = 'block';
+            } else {
+                summary.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
