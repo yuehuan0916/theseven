@@ -1,0 +1,5 @@
+import pandas as pd
+
+# 假設你的資料位於 'stations.xlsx' 中
+data = pd.read_excel('places.xlsx')
+print(data.columns)
